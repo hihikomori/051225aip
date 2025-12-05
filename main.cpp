@@ -12,6 +12,14 @@ namespace topit {
     virtual p_t next(p_t) const = 0;//чисто виртуальные методы
     virtual ~IDraw() = default;
   };
+  struct Dot: IDraw
+  {
+    p_t begin() const override;
+    p_t next(p_t) const override;
+
+    p_t d;
+  };
+  
 
 } // namespace topit
 int main() {
@@ -23,3 +31,4 @@ int main() {
 bool topit::operator==(p_t a, p_t b) { return a.x == b.x && a.y == b.y; }
 
 bool topit::operator!=(p_t a, p_t b) { return !(a == b); }
+
