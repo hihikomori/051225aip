@@ -27,11 +27,20 @@ namespace topit {
     p_t d;
   };
   
+  struct HorLine: IDraw
+  {
+    p_t begin() const override;
+    p_t next(p_t) const override;
+    HorLine(int, int, int);
+    explicit HorLine(p_t, p_t);
+    p_t beg, end;
+  };
+
   size_t points(const IDraw& d, p_t** pts, size_t& s);//[1] достать все точки из фигур
   f_t frame(const p_t* pts, size_t& s);//[2] расчитать ограниченный прямоугольник
   char* canvas(f_t ff, char fill);//[3] подготовить полотно для рисования
-  void paint(char *chv, f_t fr, p_t p, char fill);//[4] нарисовать на полотне все точки
-  void flush(std::ostream& os, const char* chv, f_t hr);//[5] вывести полотно
+  void paint(char *cnv, f_t fr, p_t p, char fill);//[4] нарисовать на полотне все точки
+  void flush(std::ostream& os, const char* cnv, f_t hr);//[5] вывести полотно
 
 }
 
@@ -45,22 +54,28 @@ int main() {
   using topit::paint;
   using topit::points;
   using topit::flush;
+  using topit::HorLine;
   IDraw* shps[3] = {};
   int err = 0;
   p_t * pts = nullptr;
   size_t s = 0;
   try{
-    shps[0] = new Dot(0, 0);
-    shps[1] = new Dot(5, 7);
-    shps[2] = new Dot(-5, -2);
+    shps[0] = new HorLine(5, 3, 6);
+    shps[1] = new HorLine({1, 0}, {6, 0});
+    shps[2] = new HorLine(3, 2, 2);
+
     for(size_t i = 0; i < 3; ++i){
-      s += topit::points(*(shps[i]), &pts, s);
+      s += points(*(shps[i]), &pts, s);
     }
-    f_t fr = topit::frame(pts, s);
+
+    f_t fr = frame(pts, s);
+
     char* cnv = canvas(fr, '.');
+
     for(size_t i = 0; i < s; ++i){
       paint(cnv, fr, pts[i], '#');
     }
+
     flush(std::cout, cnv, fr);
   }catch(...){
     std::cerr << "Bad drawing\n";
@@ -96,4 +111,32 @@ topit::p_t topit::Dot::next(p_t prev) const{
     throw std::logic_error("bad impl");
   }
   return d;
+}
+
+topit::p_t topit::HorLine::begin() const{
+  return beg;
+}
+
+topit::p_t topit::HorLine::next(p_t prev) const{
+  if(prev.x >= end.x){
+    return begin();
+  }
+  
+  return {prev.x + 1, beg.y};
+}
+
+topit::HorLine::HorLine(int y, int x1, int x2)
+: IDraw(), beg{x1, y}, end{x2, y}
+{
+  if(x1 > x2){
+    throw std::logic_error("Bad points");
+  }
+}
+
+topit::HorLine::HorLine(p_t ss, p_t ee)
+: IDraw(), beg{ss}, end(ee)
+{
+  if(ss.y != ee.y || ss.x > ee.x){
+    throw std::logic_error("Bad points");
+  }
 }
