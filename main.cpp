@@ -4,12 +4,17 @@ namespace topit {
   struct p_t {
     int x, y;
   };
+
   bool operator==(p_t, p_t);
   bool operator!=(p_t, p_t);
-  struct f_t{p_t aa, bb;};
+
+  struct f_t{
+    p_t aa, bb;
+  };
+
   struct IDraw{
     virtual p_t begin() const = 0;
-    virtual p_t next(p_t) const = 0;//чисто виртуальные методы
+    virtual p_t next(p_t) const = 0;
     virtual ~IDraw() = default;
   };
 
@@ -21,13 +26,14 @@ namespace topit {
     explicit Dot(p_t dd);
     p_t d;
   };
-  size_t points(const IDraw& d, p_t** pts, size_t& s);
-  f_t frame(const p_t* pts, size_t& s);
-  char* canvas(f_t ff, char fill);
-  void paint(char *chv, f_t fr, p_t p, char fill);
-  void flush(std::ostream& os, const char* chv, f_t hr);
+  
+  size_t points(const IDraw& d, p_t** pts, size_t& s);//[1] достать все точки из фигур
+  f_t frame(const p_t* pts, size_t& s);//[2] расчитать ограниченный прямоугольник
+  char* canvas(f_t ff, char fill);//[3] подготовить полотно для рисования
+  void paint(char *chv, f_t fr, p_t p, char fill);//[4] нарисовать на полотне все точки
+  void flush(std::ostream& os, const char* chv, f_t hr);//[5] вывести полотно
 
-} // namespace topit
+}
 
 int main() {
   using topit::IDraw;
@@ -47,8 +53,6 @@ int main() {
     shps[0] = new Dot(0, 0);
     shps[1] = new Dot(5, 7);
     shps[2] = new Dot(-5, -2);
-    //TODO:
-    //[1] достать все точки из фигур
     for(size_t i = 0; i < 3; ++i){
       s += topit::points(*(shps[i]), &pts, s);
     }
@@ -58,10 +62,6 @@ int main() {
       paint(cnv, fr, pts[i], '#');
     }
     flush(std::cout, cnv, fr);
-    //[2] расчитать ограниченный прямоугольник
-    //[3] подготовить полотно для рисования
-    //[4] нарисовать на полотне все точки
-    //[5] вывести полотно
   }catch(...){
     std::cerr << "Bad drawing\n";
     err = 2;
