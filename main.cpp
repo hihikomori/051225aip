@@ -26,9 +26,30 @@ namespace topit {
 } // namespace topit
 
 int main() {
-  using topit::p_t;
-  p_t a{1, 0}, b{1, 0};
-  std::cout << (a == b) << '\n';
+  using topit::IDraw;
+  using topit::Dot;
+  IDraw* shps[3] = {};
+  int err = 0;
+  try{
+    shps[0] = new Dot(0, 0);
+    shps[1] = new Dot(5, 7);
+    shps[2] = new Dot(-5, -2);
+    //TODO:
+    //[1] достать все точки из фигур
+    //[2] расчитать ограниченный прямоугольник
+    //[3] подготовить полотно для рисования
+    //[4] нарисовать на полотне все точки
+    //[5] вывести полотно
+  }catch(...){
+    std::cerr << "Bad drawing\n";
+    err = 2;
+  }
+
+  delete[] shps[0];
+  delete[] shps[1];
+  delete[] shps[2];
+
+  return err;
 }
 
 bool topit::operator==(p_t a, p_t b) { return a.x == b.x && a.y == b.y; }
@@ -38,6 +59,10 @@ bool topit::operator!=(p_t a, p_t b) { return !(a == b); }
 topit::Dot::Dot(int x, int y):
   IDraw(),
   d{x, y}
+{}
+
+topit::Dot::Dot(p_t dd):
+IDraw(), d(dd)
 {}
 
 topit::p_t topit::Dot::begin() const{
